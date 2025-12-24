@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Card } from "@/components/ui/card";
-import { Package, Thermometer, Shield, TrendingDown, AlertTriangle } from "lucide-react";
+import { Package, Thermometer, Shield, AlertTriangle } from "lucide-react";
 
 interface StatsCardsProps {
   activeShipments?: number;
@@ -17,10 +17,21 @@ export function StatsCards({ activeShipments = 0, avgTemperature = -18, alertCou
     alerts: 0,
   });
 
+  const currentValuesRef = useRef({
+    shipments: 0,
+    temperature: -18,
+    alerts: 0,
+  });
+
   // Calculate compliance rate
   const totalLogs = activeShipments;
   const compliantLogs = totalLogs - alertCount;
   const complianceRate = totalLogs > 0 ? ((compliantLogs / totalLogs) * 100).toFixed(1) : "100.0";
+
+  // Update ref when values change
+  useEffect(() => {
+    currentValuesRef.current = animatedValues;
+  }, [animatedValues]);
 
   // Animate values
   useEffect(() => {
@@ -46,13 +57,13 @@ export function StatsCards({ activeShipments = 0, avgTemperature = -18, alertCou
       }, stepDuration);
     };
 
-    animate(animatedValues.shipments, activeShipments, (val) =>
+    animate(currentValuesRef.current.shipments, activeShipments, (val) =>
       setAnimatedValues((prev) => ({ ...prev, shipments: val }))
     );
-    animate(animatedValues.temperature, avgTemperature, (val) =>
+    animate(currentValuesRef.current.temperature, avgTemperature, (val) =>
       setAnimatedValues((prev) => ({ ...prev, temperature: val }))
     );
-    animate(animatedValues.alerts, alertCount, (val) =>
+    animate(currentValuesRef.current.alerts, alertCount, (val) =>
       setAnimatedValues((prev) => ({ ...prev, alerts: val }))
     );
   }, [activeShipments, avgTemperature, alertCount]);

@@ -3,8 +3,6 @@
 import { Card } from "@/components/ui/card";
 import { TrendingUp, TrendingDown, Minus } from "lucide-react";
 import {
-  LineChart,
-  Line,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -14,6 +12,20 @@ import {
   AreaChart,
 } from "recharts";
 import type { TemperatureLog } from "@/hooks/useColdChainTracker";
+
+interface TooltipProps {
+  active?: boolean;
+  payload?: Array<{
+    payload: {
+      time: string;
+      fullTime: string;
+      temperature: number;
+      location: string;
+      cargo: string;
+      isWarning: boolean;
+    };
+  }>;
+}
 
 interface TemperatureChartProps {
   logs: TemperatureLog[];
@@ -56,14 +68,14 @@ export const TemperatureChart = ({ logs }: TemperatureChartProps) => {
 
   // Calculate trend
   const temperatures = chartData.map((d) => d.temperature);
-  const firstTemp = temperatures[0];
-  const lastTemp = temperatures[temperatures.length - 1];
+  const firstTemp = temperatures[0]!;
+  const lastTemp = temperatures[temperatures.length - 1]!;
   const trend = lastTemp - firstTemp;
   const TrendIcon = trend > 0 ? TrendingUp : trend < 0 ? TrendingDown : Minus;
   const trendColor = trend > 2 ? "text-orange-500" : trend < -2 ? "text-blue-500" : "text-green-500";
 
   // Custom tooltip
-  const CustomTooltip = ({ active, payload }: any) => {
+  const CustomTooltip = ({ active, payload }: TooltipProps) => {
     if (active && payload && payload.length) {
       const data = payload[0].payload;
       return (

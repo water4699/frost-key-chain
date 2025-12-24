@@ -1,6 +1,6 @@
 "use client";
 
-import { Shield, Key } from "lucide-react";
+import { Shield } from "lucide-react";
 import { useEffect, useState } from "react";
 
 export function Footer() {
